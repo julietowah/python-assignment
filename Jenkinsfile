@@ -1,54 +1,35 @@
-Pipeline {
-    Agent {
-        Node {
-            Label 'SLAVE01'
-        }
-    }
+pipeline {
+    agent any
 
-    Tools {
-        Maven 'maven3'
-    }
-
-    Options {
-        BuildDiscarder LogRotator(
-            DaysToKeepStr: '15',
-            NumToKeepStr: '10'
-        )
-    }
-
-    Environment {
-        APP_NAME = "DCUBE_APP"
-        APP_ENV = "DEV"
-    }
-
-    Stages {
-        Stage('Cleanup Workspace') {
-            Steps {
-                CleanWs()
-                Sh 'echo "Cleaned Up Workspace for ${APP_NAME}"'
+    stages {
+        stage('Build') {
+            steps {
+                // Your build steps go here
+                echo 'Building the project...'
             }
         }
 
-        Stage('Code Checkout') {
-            Steps {
-                Checkout([
-                    $class: 'GitSCM',
-                    Branches: [[name: '*/master']],
-                    UserRemoteConfigs: [[url: 'https://github.com/spring-projects/spring-petclinic.git']]
-                ])
+        stage('Test') {
+            steps {
+                // Your test steps go here
+                echo 'Running tests...'
             }
         }
 
-        Stage('Code Build') {
-            Steps {
-                Sh 'mvn install -Dmaven.test.skip=true'
+        stage('Deploy') {
+            steps {
+                // Your deployment steps go here
+                echo 'Deploying the application...'
             }
         }
+    }
 
-        Stage('Printing All Global Variables') {
-            Steps {
-                Sh 'env'
-            }
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the build logs.'
         }
     }
 }
